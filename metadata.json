@@ -1,0 +1,8 @@
+{
+  "name": "한스바이오메드 업무용 챗봇",
+  "description": "한스바이오메드 임직원을 위한 전문 비즈니스 어시스턴트. 사내 지식 학습 및 텔레그램 스타일 UI 제공.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
