@@ -415,20 +415,32 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-bold text-slate-700">2단계: Vercel/Netlify 배포 시 설정</p>
-                  <p className="text-xs text-slate-500">배포 플랫폼의 <b>Settings &gt; Environment Variables</b> 메뉴로 이동합니다.</p>
-                  <div className="bg-slate-900 text-white p-3 rounded-xl font-mono text-xs mt-2">
-                    Variable Name: <span className="text-orange-400">API_KEY</span><br/>
-                    Value: <span className="text-green-400">발급받은_키_붙여넣기</span>
+                  <p className="text-sm font-bold text-slate-700">2단계: Netlify 배포 설정</p>
+                  <p className="text-xs text-slate-500">Netlify 프로젝트의 <b>Site configuration &gt; Environment variables</b> 메뉴로 이동합니다.</p>
+                  <div className="bg-slate-900 text-white p-3 rounded-xl font-mono text-xs mt-2 border border-slate-700">
+                    Key: <span className="text-orange-400 font-bold">API_KEY</span><br/>
+                    Value: <span className="text-green-400">AIzaSy... (발급받은 키)</span>
                   </div>
                 </div>
 
+                <div className="space-y-2 p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                  <p className="text-sm font-bold text-orange-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    3단계: 사이트 재배포 (필수!)
+                  </p>
+                  <p className="text-xs text-orange-600 leading-relaxed">
+                    환경 변수를 저장한 후, **[Deploys]** 탭으로 이동하여 **[Trigger deploy] -> [Deploy site]**를 눌러야 설정값이 실제 웹사이트에 반영됩니다.
+                  </p>
+                </div>
+
                 <div className="pt-4 border-t border-slate-100">
-                  <p className="text-[11px] text-slate-400 text-center">이제 임직원들에게 배포된 URL만 공유하면 모든 세팅이 끝납니다.</p>
+                  <p className="text-[11px] text-slate-400 text-center italic">이제 임직원들에게 배포된 URL만 공유하면 모든 세팅이 끝납니다.</p>
                 </div>
               </div>
               
-              <button onClick={() => setShowDeployGuide(false)} className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">확인 완료</button>
+              <button onClick={() => setShowDeployGuide(false)} className="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-slate-200 active:scale-95 transition-all">설정을 완료했습니다</button>
             </div>
           </div>
         )}

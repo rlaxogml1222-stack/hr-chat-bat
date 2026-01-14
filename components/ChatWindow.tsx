@@ -60,15 +60,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         <div className="flex items-center gap-3">
           {/* Admin Toggle */}
-          <button 
-            onClick={onAdminToggle} 
-            className={`p-2 rounded-full transition-all border ${isAdmin ? 'bg-orange-50 text-orange-600 border-orange-200 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
-            title={isAdmin ? "관리자 모드 비활성화" : "관리자 모드 활성화"}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-full border border-slate-100 pr-3">
+            <button 
+              onClick={onAdminToggle} 
+              className={`p-2 rounded-full transition-all border ${isAdmin ? 'bg-orange-500 text-white border-orange-600 shadow-sm' : 'bg-white text-slate-400 border-slate-200 hover:text-slate-600'}`}
+              title={isAdmin ? "관리자 모드 비활성화" : "관리자 모드 활성화"}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </button>
+            {!isAdmin && <span className="text-[10px] text-slate-400 font-bold cursor-default select-none">관리자</span>}
+          </div>
 
           <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
             <button onClick={() => onModelChange(ModelType.FLASH)} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${model === ModelType.FLASH ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>FLASH</button>

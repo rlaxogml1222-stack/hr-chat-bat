@@ -9,13 +9,13 @@ export const generateBizResponse = async (
   model: ModelType = ModelType.FLASH,
   useSearch: boolean = false
 ) => {
-  // process.env가 정의되지 않았을 경우를 대비해 안전하게 키 추출
-  const apiKey = (window as any).process?.env?.API_KEY || (process as any)?.env?.API_KEY;
+  // process.env.API_KEY를 직접 참조 (Vite/Netlify 환경 대응)
+  const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
   
-  if (!apiKey) {
-    console.warn("API_KEY is not configured in environment variables.");
+  if (!apiKey || apiKey === "undefined" || apiKey === "") {
+    console.warn("API_KEY is missing.");
     return {
-      text: "현재 시스템의 보안 연결(API Key)이 설정되지 않았습니다. 관리자 대시보드의 '임직원 배포 가이드'를 확인하여 환경변수를 설정해 주세요.",
+      text: "⚠️ **시스템 보안 연결(API Key) 설정이 완료되지 않았습니다.**\n\n**해결 방법:**\n1. Netlify 환경 변수에 `API_KEY`를 등록하셨나요?\n2. 등록 후 **[Deploys] -> [Trigger deploy] -> [Deploy site]**를 눌러 사이트를 다시 빌드하셨나요?\n\n위 절차를 완료해야 AI 기능이 활성화됩니다. 상세 내용은 우측 상단 자물쇠(관리자) -> '임직원 배포 가이드'를 확인하세요.",
       groundingChunks: []
     };
   }
@@ -70,7 +70,7 @@ export const generateBizResponse = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message?.includes("API key not valid")) {
-      return { text: "설정된 API 키가 유효하지 않습니다. 환경변수(API_KEY) 설정을 다시 확인하세요.", groundingChunks: [] };
+      return { text: "설정된 API 키가 유효하지 않습니다. Netlify 환경변수(API_KEY) 값을 다시 확인하고 재배포해 주세요.", groundingChunks: [] };
     }
     return { text: "AI 서비스 호출 중 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.", groundingChunks: [] };
   }
