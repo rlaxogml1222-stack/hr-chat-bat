@@ -6,6 +6,18 @@ import ChatWindow from './components/ChatWindow';
 import InputArea from './components/InputArea';
 import { generateBizResponse } from './services/geminiService';
 
+// Fix: Define AIStudio interface to match the environment's expectation for window.aistudio.
+interface AIStudio {
+  hasSelectedApiKey: () => Promise<boolean>;
+  openSelectKey: () => Promise<void>;
+}
+
+declare global {
+  interface Window {
+    aistudio: AIStudio;
+  }
+}
+
 const HANS_DOC_KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'hans_approval_common',
@@ -114,6 +126,30 @@ const App: React.FC = () => {
     }
   };
 
+  const handlePersonalKeyLogin = async () => {
+    if (userName.trim().length < 2 || employeeId.trim().length < 2) {
+      alert("성함과 사번을 먼저 입력하신 후 개인 키를 연결해 주세요.");
+      return;
+    }
+
+    try {
+      // Check if API key is already selected before prompting.
+      const hasKey = await window.aistudio.hasSelectedApiKey();
+      if (!hasKey) {
+        await window.aistudio.openSelectKey();
+      }
+      // Assume the key selection was successful after triggering openSelectKey() or if it already exists.
+      setIsAuthenticated(true);
+      localStorage.setItem('hb_auth_v3', 'true');
+      localStorage.setItem('hb_user_name', userName.trim());
+      localStorage.setItem('hb_employee_id', employeeId.trim());
+      alert("개인 API 키가 연결되었습니다. 이제 본인의 프로젝트 권한으로 AI를 사용합니다.");
+    } catch (err) {
+      console.error("API Key Selection failed:", err);
+      alert("API 키 연결에 실패했습니다.");
+    }
+  };
+
   const handleAdminToggle = () => {
     if (isAdmin) {
       setIsAdmin(false);
@@ -167,6 +203,13 @@ const App: React.FC = () => {
         usedSearch: useSearch
       };
       setMasterActivities(prev => [activity, ...prev].slice(0, 1000));
+    } catch (error: any) {
+      console.error("Chat Error:", error);
+      // If the request fails with an error message containing "Requested entity was not found.", reset the key selection state and prompt.
+      if (error?.message?.includes("Requested entity was not found.")) {
+        alert("API 키가 유효하지 않거나 찾을 수 없습니다. 다시 설정해 주세요.");
+        await window.aistudio.openSelectKey();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -191,64 +234,61 @@ const App: React.FC = () => {
           </div>
           
           <div className="text-center mb-10">
-            <h1 className="text-2xl font-black text-slate-800 mb-2">임직원 인증</h1>
-            <p className="text-sm text-slate-400 font-medium">서비스 이용을 위해 사번과 성함을 입력해주세요.</p>
+            <h1 className="text-2xl font-black text-slate-800 mb-2">임직원 로그인</h1>
+            <p className="text-sm text-slate-400 font-medium">사용 방식을 선택하여 접속해 주세요.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 ml-1">사번 (Employee ID)</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                  </svg>
-                </div>
-                <input 
-                  type="text" 
-                  value={employeeId} 
-                  onChange={e => setEmployeeId(e.target.value)}
-                  placeholder="사번 입력" 
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
-                />
-              </div>
+              <input 
+                type="text" 
+                value={employeeId} 
+                onChange={e => setEmployeeId(e.target.value)}
+                placeholder="사번 입력" 
+                className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
+              />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 ml-1">성함 (Name)</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <input 
-                  type="text" 
-                  value={userName} 
-                  onChange={e => setUserName(e.target.value)}
-                  placeholder="성함 입력" 
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
-                />
-              </div>
+              <input 
+                type="text" 
+                value={userName} 
+                onChange={e => setUserName(e.target.value)}
+                placeholder="성함 입력" 
+                className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-bold text-slate-700"
+              />
             </div>
 
             <button 
               type="submit"
               disabled={userName.trim().length < 2 || employeeId.trim().length < 2}
-              className={`w-full py-4 mt-4 rounded-2xl font-bold text-white shadow-xl transition-all active:scale-[0.98] ${
+              className={`w-full py-4 mt-2 rounded-2xl font-bold text-white shadow-xl transition-all active:scale-[0.98] ${
                 userName.trim().length < 2 || employeeId.trim().length < 2
                 ? 'bg-slate-300 shadow-none cursor-not-allowed'
                 : 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700'
               }`}
             >
-              로그인
+              사내 공용 모드로 시작
             </button>
           </form>
-          
-          <p className="mt-8 text-[11px] text-slate-400 text-center leading-relaxed">
-            본 서비스는 한스바이오메드 임직원 전용입니다.<br/>
-            인가되지 않은 사용자의 접근은 금지됩니다.
-          </p>
+
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <p className="text-[11px] text-slate-400 font-bold mb-3 text-center uppercase tracking-widest">본인 API 키 사용 (프라이버시 강화)</p>
+            <button 
+              onClick={handlePersonalKeyLogin}
+              className="w-full py-4 rounded-2xl font-bold text-slate-700 border-2 border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              개인 Google AI 키 연결하기
+            </button>
+            <p className="mt-3 text-[10px] text-slate-400 text-center leading-relaxed px-4">
+              개인 키 사용 시 모든 질문 내역은 <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" className="text-blue-500 underline font-bold">본인 결제 프로젝트</a>에 청구되며, 관리자가 활동 로그를 조회할 수 없습니다.
+            </p>
+          </div>
         </div>
       </div>
     );

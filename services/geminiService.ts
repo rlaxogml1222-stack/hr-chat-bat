@@ -9,8 +9,8 @@ export const generateBizResponse = async (
   model: ModelType = ModelType.FLASH,
   useSearch: boolean = false
 ) => {
-  // process.env.API_KEY를 직접 참조 (Vite/Netlify 환경 대응)
-  const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
+  // Fix: Directly use process.env.API_KEY as per @google/genai guidelines.
+  const apiKey = process.env.API_KEY;
   
   if (!apiKey || apiKey === "undefined" || apiKey === "") {
     console.warn("API_KEY is missing.");
@@ -20,6 +20,7 @@ export const generateBizResponse = async (
     };
   }
 
+  // Create a new instance right before making an API call to ensure it uses the most up-to-date key.
   const ai = new GoogleGenAI({ apiKey });
   
   const knowledgeContext = knowledge.length > 0 
@@ -60,6 +61,7 @@ export const generateBizResponse = async (
       config,
     });
 
+    // Fix: Access response.text directly (it is a getter, not a method).
     const text = response.text || "응답을 생성할 수 없습니다.";
     const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
 
@@ -69,9 +71,7 @@ export const generateBizResponse = async (
     };
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message?.includes("API key not valid")) {
-      return { text: "설정된 API 키가 유효하지 않습니다. Netlify 환경변수(API_KEY) 값을 다시 확인하고 재배포해 주세요.", groundingChunks: [] };
-    }
-    return { text: "AI 서비스 호출 중 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.", groundingChunks: [] };
+    // Propagate error for the caller to handle specific cases (like Requested entity was not found).
+    throw error;
   }
 };
