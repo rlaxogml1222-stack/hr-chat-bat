@@ -416,7 +416,7 @@ const App: React.FC = () => {
 
                 <div className="space-y-2">
                   <p className="text-sm font-bold text-slate-700">2단계: Vercel/Netlify 배포 시 설정</p>
-                  <p className="text-xs text-slate-500">배포 플랫폼의 <b>Settings > Environment Variables</b> 메뉴로 이동합니다.</p>
+                  <p className="text-xs text-slate-500">배포 플랫폼의 <b>Settings &gt; Environment Variables</b> 메뉴로 이동합니다.</p>
                   <div className="bg-slate-900 text-white p-3 rounded-xl font-mono text-xs mt-2">
                     Variable Name: <span className="text-orange-400">API_KEY</span><br/>
                     Value: <span className="text-green-400">발급받은_키_붙여넣기</span>
