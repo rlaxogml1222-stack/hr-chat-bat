@@ -431,7 +431,7 @@ const App: React.FC = () => {
                     3단계: 사이트 재배포 (필수!)
                   </p>
                   <p className="text-xs text-orange-600 leading-relaxed">
-                    환경 변수를 저장한 후, **[Deploys]** 탭으로 이동하여 **[Trigger deploy] -> [Deploy site]**를 눌러야 설정값이 실제 웹사이트에 반영됩니다.
+                    환경 변수를 저장한 후, **[Deploys]** 탭으로 이동하여 **[Trigger deploy] &rarr; [Deploy site]**를 눌러야 설정값이 실제 웹사이트에 반영됩니다.
                   </p>
                 </div>
 
