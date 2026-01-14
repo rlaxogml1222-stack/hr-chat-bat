@@ -6,16 +6,16 @@ export const generateBizResponse = async (
   prompt: string,
   history: Message[],
   knowledge: KnowledgeEntry[] = [],
-  model: ModelType = ModelType.FLASH, // 기본값 Flash (무료 티어 최적화)
+  model: ModelType = ModelType.FLASH,
   useSearch: boolean = false
 ) => {
-  // 환경변수에서 키를 가져옴. 배포 플랫폼(Vercel 등)에서 설정 필수.
-  const apiKey = process.env.API_KEY;
+  // process.env가 정의되지 않았을 경우를 대비해 안전하게 키 추출
+  const apiKey = (window as any).process?.env?.API_KEY || (process as any)?.env?.API_KEY;
   
   if (!apiKey) {
-    console.error("API_KEY가 설정되지 않았습니다. 배포 환경의 환경변수를 확인하세요.");
+    console.warn("API_KEY is not configured in environment variables.");
     return {
-      text: "현재 시스템 점검 중이거나 보안 연결(API Key)이 설정되지 않았습니다. 관리자에게 문의해 주세요.",
+      text: "현재 시스템의 보안 연결(API Key)이 설정되지 않았습니다. 관리자 대시보드의 '임직원 배포 가이드'를 확인하여 환경변수를 설정해 주세요.",
       groundingChunks: []
     };
   }
@@ -55,7 +55,7 @@ export const generateBizResponse = async (
 
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: model, // Flash 모델 사용 권장 (무료)
+      model: model,
       contents,
       config,
     });
@@ -70,8 +70,8 @@ export const generateBizResponse = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message?.includes("API key not valid")) {
-      return { text: "설정된 API 키가 유효하지 않습니다. 관리자 설정을 확인하세요.", groundingChunks: [] };
+      return { text: "설정된 API 키가 유효하지 않습니다. 환경변수(API_KEY) 설정을 다시 확인하세요.", groundingChunks: [] };
     }
-    throw error;
+    return { text: "AI 서비스 호출 중 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.", groundingChunks: [] };
   }
 };

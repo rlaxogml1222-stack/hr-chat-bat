@@ -9,6 +9,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <title>한스바이오메드 업무용 챗봇</title>
+  
+  <!-- Critical: process.env Polyfill for Browser Environments -->
+  <script>
+    window.process = window.process || { env: {} };
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,14 +74,10 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #bcc2c9; border-radius: 10px; }
 
-    /* PWA Install Button Animation */
-    @keyframes bounce-subtle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-    .animate-bounce-subtle {
-      animation: bounce-subtle 2s infinite ease-in-out;
-    }
+    /* Custom Scrollbar for Master Dashboard */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   </style>
 <script type="importmap">
 {
@@ -90,5 +92,7 @@
 </head>
 <body class="tg-bg">
   <div id="root"></div>
+  <!-- Ensure index.tsx is executed -->
+  <script type="module" src="index.tsx"></script>
 </body>
 </html>
